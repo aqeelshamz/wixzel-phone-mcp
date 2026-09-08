@@ -1,5 +1,9 @@
 # wixzel-phone
 
+[![npm](https://img.shields.io/npm/v/wixzel-phone?style=flat-square&logo=npm&logoColor=white&label=npm&color=A0D425&labelColor=0D0D0D)](https://www.npmjs.com/package/wixzel-phone)
+[![pub.dev](https://img.shields.io/pub/v/wixzel_phone?style=flat-square&logo=dart&logoColor=white&label=pub.dev&color=A0D425&labelColor=0D0D0D)](https://pub.dev/packages/wixzel_phone)
+[![MIT](https://img.shields.io/badge/licence-MIT-A0D425?style=flat-square&labelColor=0D0D0D)](LICENSE)
+
 The official TypeScript and JavaScript SDK for the [Wixzel Phone](https://phone.wixzel.com) API: AI voice agents that place and answer real phone calls over your own SIP trunk. One API key, one prepaid balance, every voice engine.
 
 - Every `/v1` endpoint as a typed method, with types generated from the same OpenAPI document that validates the API.

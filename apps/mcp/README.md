@@ -1,5 +1,7 @@
 # wixzel-phone-mcp
 
+[![npm](https://img.shields.io/npm/v/wixzel-phone-mcp?style=flat-square&logo=npm&logoColor=white&label=npm&color=A0D425&labelColor=0D0D0D)](https://www.npmjs.com/package/wixzel-phone-mcp)
+[![MIT](https://img.shields.io/badge/licence-MIT-A0D425?style=flat-square&labelColor=0D0D0D)](LICENSE)
 **Wixzel Phone for AI agents.** A [Model Context Protocol](https://modelcontextprotocol.io) server that lets Claude Code, claude.ai, Claude Desktop, Cursor, and any other MCP client create voice agents, connect a carrier, place calls, run campaigns, and read what it all cost, using the [Wixzel Phone](https://phone.wixzel.com) API.
 
 > Wixzel Phone: APIs for AI voice agents. One API key, one balance, every voice engine.

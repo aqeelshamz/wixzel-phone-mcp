@@ -1,5 +1,10 @@
 # Wixzel Phone SDKs
 
+[![npm](https://img.shields.io/npm/v/wixzel-phone?style=flat-square&logo=npm&logoColor=white&label=npm&color=A0D425&labelColor=0D0D0D)](https://www.npmjs.com/package/wixzel-phone)
+[![pub.dev](https://img.shields.io/pub/v/wixzel_phone?style=flat-square&logo=dart&logoColor=white&label=pub.dev&color=A0D425&labelColor=0D0D0D)](https://pub.dev/packages/wixzel_phone)
+[![npm](https://img.shields.io/npm/v/wixzel-phone-mcp?style=flat-square&logo=npm&logoColor=white&label=npm&color=A0D425&labelColor=0D0D0D)](https://www.npmjs.com/package/wixzel-phone-mcp)
+[![MIT](https://img.shields.io/badge/licence-MIT-A0D425?style=flat-square&labelColor=0D0D0D)](LICENSE)
+
 Public source for the packages [Wixzel Phone](https://phone.wixzel.com) publishes: AI voice agents that place and answer real phone calls over your own SIP trunk.
 
 | Package | Registry | Source |

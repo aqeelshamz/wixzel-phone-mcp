@@ -10,7 +10,7 @@
 import { randomUUID } from 'node:crypto';
 
 export const DEFAULT_BASE_URL = 'https://api.phone.wixzel.com';
-export const USER_AGENT = 'wixzel-phone-mcp/0.2.0';
+export const USER_AGENT = 'wixzel-phone-mcp/0.2.1';
 
 export type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'DELETE';
 
