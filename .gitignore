@@ -1,5 +1,11 @@
 node_modules/
 dist/
-.env
+package-lock.json
 *.log
 .DS_Store
+.env
+
+# Dart
+.dart_tool/
+pubspec.lock
+build/

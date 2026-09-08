@@ -1,51 +1,23 @@
 {
-  "name": "wixzel-phone-mcp",
-  "version": "0.1.0",
-  "description": "MCP server for Wixzel Phone — lets AI agents such as Claude Code create voice agents, place calls, manage leads and campaigns, and read usage over the Wixzel Phone API.",
+  "name": "wixzel-phone-sdks",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Public source for the published Wixzel Phone packages. Mirrored from the monorepo that also holds the API.",
   "license": "MIT",
-  "type": "module",
-  "bin": {
-    "wixzel-phone-mcp": "dist/index.js"
-  },
-  "main": "dist/server.js",
-  "types": "dist/server.d.ts",
-  "files": [
-    "dist",
-    "README.md"
+  "workspaces": [
+    "packages/sdk-ts",
+    "apps/mcp"
   ],
   "engines": {
     "node": ">=20"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json && chmod +x dist/index.js",
-    "dev": "tsx src/index.ts",
-    "start": "node dist/index.js",
-    "test": "tsx --test test/*.test.ts",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "inspect": "npx @modelcontextprotocol/inspector node dist/index.js",
-    "prepublishOnly": "npm run build && npm test"
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
   },
-  "keywords": [
-    "mcp",
-    "model-context-protocol",
-    "wixzel",
-    "voice-agents",
-    "telephony",
-    "claude-code",
-    "ai-agents"
-  ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/aqeelshamz/wixzel-phone-mcp"
+    "url": "git+https://github.com/aqeelshamz/wixzel-phone-sdks.git"
   },
-  "homepage": "https://phone.wixzel.com",
-  "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.30.0",
-    "zod": "^4.5.4"
-  },
-  "devDependencies": {
-    "@types/node": "^22.20.1",
-    "tsx": "^4.23.13",
-    "typescript": "^5.9.3"
-  }
+  "homepage": "https://docs.phone.wixzel.com/sdks"
 }

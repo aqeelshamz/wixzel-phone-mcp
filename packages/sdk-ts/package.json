@@ -1,0 +1,68 @@
+{
+  "name": "wixzel-phone",
+  "version": "0.1.0",
+  "description": "Official TypeScript and JavaScript SDK for the Wixzel Phone API: AI voice agents that place and answer real phone calls over your own SIP trunk.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/cjs/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "generate": "openapi-typescript ../../docs/openapi.json -o src/generated/openapi.ts --export-type --root-types --root-types-no-schema-prefix",
+    "build": "rm -rf dist && tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && node -e \"require('fs').writeFileSync('dist/cjs/package.json', '{\\\"type\\\":\\\"commonjs\\\"}\\n')\"",
+    "test": "tsx --test test/*.test.ts",
+    "typecheck": "tsc -p tsconfig.esm.json --noEmit",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "keywords": [
+    "wixzel",
+    "wixzel-phone",
+    "voice-agents",
+    "telephony",
+    "sip",
+    "ai",
+    "sdk",
+    "api-client"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aqeelshamz/wixzel-phone-sdks.git",
+    "directory": "packages/sdk-ts"
+  },
+  "homepage": "https://docs.phone.wixzel.com/sdks",
+  "bugs": {
+    "url": "https://github.com/aqeelshamz/wixzel-phone-sdks/issues"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.0",
+    "openapi-typescript": "^7.13.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}

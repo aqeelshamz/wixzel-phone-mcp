@@ -1,0 +1,12 @@
+{
+  "name": "@wixzel/sdk-dart",
+  "version": "0.1.0",
+  "private": true,
+  "description": "npm-workspace shim for the Dart package wixzel_phone. The real metadata is pubspec.yaml; these scripts run dart when it is installed and skip cleanly when it is not (Vercel, the VPS).",
+  "scripts": {
+    "test": "node scripts/dart.mjs test",
+    "lint": "node scripts/dart.mjs analyze --fatal-infos",
+    "format": "node scripts/dart.mjs format --output=none --set-exit-if-changed .",
+    "publish:dry": "node scripts/dart.mjs pub publish --dry-run"
+  }
+}

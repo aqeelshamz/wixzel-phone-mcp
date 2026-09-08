@@ -1,0 +1,4 @@
+# Repo plumbing: the npm-workspace shim that lets `npm test` reach this
+# package. Not part of what pub.dev ships.
+package.json
+scripts/

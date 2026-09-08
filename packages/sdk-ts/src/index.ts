@@ -1,0 +1,21 @@
+export { WixzelPhone, type WixzelPhoneOptions } from './client.js';
+export { WixzelError, WixzelConnectionError } from './core/error.js';
+export { Page } from './core/page.js';
+export { lastResponse, type ResponseMeta } from './core/response.js';
+export { DEFAULT_BASE_URL, type HttpMethod, type Query, type RequestOptions } from './core/http.js';
+export { OPERATIONS, SCOPES, type Operation } from './operations.js';
+export { VERSION } from './version.js';
+export type * from './types.js';
+
+export { Agents } from './resources/agents.js';
+export { Calls } from './resources/calls.js';
+export { Leads } from './resources/leads.js';
+export { Campaigns } from './resources/campaigns.js';
+export { KnowledgeBases } from './resources/knowledge-bases.js';
+export { PhoneNumbers } from './resources/phone-numbers.js';
+export { SipTrunks } from './resources/sip-trunks.js';
+export { Appointments } from './resources/appointments.js';
+export { Usage } from './resources/usage.js';
+export { Billing } from './resources/billing.js';
+export { ApiKeys } from './resources/api-keys.js';
+export { Engines } from './resources/engines.js';
