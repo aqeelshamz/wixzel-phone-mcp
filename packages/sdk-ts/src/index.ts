@@ -19,3 +19,5 @@ export { Usage } from './resources/usage.js';
 export { Billing } from './resources/billing.js';
 export { ApiKeys } from './resources/api-keys.js';
 export { Engines } from './resources/engines.js';
+export { Webhooks } from './resources/webhooks.js';
+export { Realtime } from './resources/realtime.js';

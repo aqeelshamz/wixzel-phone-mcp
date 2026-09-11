@@ -368,6 +368,192 @@ export type paths = {
         };
         trace?: never;
     };
+    "/v1/agents/{id}/test-call": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Place a test call
+         * @description Ring a number and have the agent speak one phrase, then hang up. A probe rather than a conversation: it answers "is my trunk configured and does this agent sound right" in a few seconds, without anyone having to hold a conversation with it. For a real conversation use POST /v1/calls.
+         *
+         *     It rings a real phone over your real carrier and it spends real credit — the meter runs on a test call exactly as on any other, so it needs `calls:write` and an `Idempotency-Key`.
+         *
+         *     Human transfer is deliberately not offered during a test call, so this cannot be used to check that a transfer destination answers.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["TestCall"];
+                };
+            };
+            responses: {
+                /** @description The test call, queued */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Call"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Missing or invalid API key */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Key lacks the required scope */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description No such record */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Rate limited. Retry after the interval in `Retry-After`. */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/realtime/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create a realtime session
+         * @description Mint a one-minute, single-use `client_secret` that lets a browser or app talk to one of your agents over `wss://api.phone.wixzel.com/v1/realtime` — no SIP trunk, no phone number. Call this from your server; the API key must never reach the client.
+         *
+         *     Nothing is charged here. When the socket connects, the session is admitted exactly like a call: it needs credit, counts toward your concurrent-call limit and the key's spend limit, is billed at the same per-minute price as a phone call on the same engine, and appears in GET /v1/calls with `channel: "web"`, followed by a `callCompleted` webhook.
+         *
+         *     Human transfer is not available on web sessions — there is no second line to hand the caller to.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["CreateRealtimeSession"];
+                };
+            };
+            responses: {
+                /** @description The session and its client secret */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["RealtimeSession"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Missing or invalid API key */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Key lacks the required scope */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description No such record */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Rate limited. Retry after the interval in `Retry-After`. */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/leads": {
         parameters: {
             query?: never;
@@ -3026,6 +3212,7 @@ export type paths = {
                     ending_before?: string;
                     status?: "queued" | "ringing" | "in-progress" | "completed" | "failed" | "busy" | "no-answer" | "canceled";
                     direction?: "inbound" | "outbound";
+                    channel?: "phone" | "web";
                     agent_id?: string;
                     campaign_id?: string;
                     engine?: string;
@@ -4262,12 +4449,562 @@ export type paths = {
                                 models: {
                                     /** @enum {string} */
                                     component: "stt" | "llm" | "tts" | "realtime" | "telephony" | "platform_fee" | "platform_api";
+                                    /** @example openrouter/anthropic/claude-sonnet-4.5 */
                                     model: string;
                                     unit: string;
                                     price_micros: number;
+                                    /** @description True for the model this engine runs when the agent names none, which is also what its headline per-minute price is quoted from. Every other entry is selectable: name it in the agent's voice config and the call is priced from your choice, not from this default. */
+                                    default: boolean;
                                 }[];
                             }[];
                         };
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Missing or invalid API key */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Key lacks the required scope */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Rate limited. Retry after the interval in `Retry-After`. */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/engines/{engine}/languages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List an engine's languages
+         * @description Which languages an engine can hold a conversation in. A composed engine lists a language only when both its speech-to-text and its text-to-speech serve it — one that is transcribed but cannot be spoken back is not a language the engine supports end to end. Use a `code` from here as the agent's `language`, or as `voice.stt.language` / `voice.realtime.language`. Unknown engine ids are a 404; an engine whose provider is momentarily degraded still answers, with `available: false`.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    engine: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Supported languages */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["EngineLanguageList"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Missing or invalid API key */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Key lacks the required scope */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description No such record */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Rate limited. Retry after the interval in `Retry-After`. */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/engines/{engine}/voices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List an engine's speaker voices
+         * @description The voices an engine can speak as. Use an `id` from here as `voice.tts.voice` (composed engines) or `voice.realtime.voice` (realtime engines). Sarvam and Gemini publish fixed rosters; the ElevenLabs-backed engines are fetched and cached for an hour, and if ElevenLabs cannot be reached the last good list is returned with `stale: true` rather than an error.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    engine: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Available voices */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["EngineVoiceList"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Missing or invalid API key */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Key lacks the required scope */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description No such record */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Rate limited. Retry after the interval in `Retry-After`. */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/webhook": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Retrieve the webhook endpoint
+         * @description One endpoint per account. Returns null for `url` until you set one, and never returns the signing secret — only whether one exists. Requires `webhooks:read`.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Your webhook configuration */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Webhook"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Missing or invalid API key */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Key lacks the required scope */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Rate limited. Retry after the interval in `Retry-After`. */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update the webhook endpoint
+         * @description Only the fields you send are changed, except `events`, which replaces the subscription entirely. The URL must resolve to a public address — one pointing at loopback, link-local or private space is refused here and again at delivery time. Enabling without a URL is refused rather than saved. Requires `webhooks:write`.
+         */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["UpdateWebhook"];
+                };
+            };
+            responses: {
+                /** @description The updated configuration */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Webhook"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Missing or invalid API key */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Key lacks the required scope */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Rate limited. Retry after the interval in `Retry-After`. */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/v1/webhook/rotate-secret": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Rotate the signing secret
+         * @description Mints a new signing secret and returns it once. The old secret stops verifying immediately, so your receiver will reject events until it has the new one — rotate deliberately, not as part of a routine update. Requires `webhooks:write`.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description The new secret, shown once */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["WebhookSecret"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Missing or invalid API key */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Key lacks the required scope */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Rate limited. Retry after the interval in `Retry-After`. */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/webhook/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send a test event
+         * @description POSTs one sample payload to your URL right now and hands back what came back. It goes through the same delivery path as a real event — same headers, same signature, and it is recorded in the delivery list — but it deliberately ignores `enabled` and your event subscription, because the question it answers is whether your endpoint works before you turn delivery on. The payload carries obviously fake sample data. Requires `webhooks:write`.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["TestWebhook"];
+                };
+            };
+            responses: {
+                /** @description What your endpoint answered */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["WebhookDelivery"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Missing or invalid API key */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Key lacks the required scope */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Rate limited. Retry after the interval in `Retry-After`. */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/webhook/deliveries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List delivery attempts
+         * @description One record per POST we made, newest first — so an event delivered on its third try is three records and a flapping receiver is visible as such. `response_status` is null when nothing answered at all, which is what separates "never arrived" from "arrived and your handler threw". Cursor-paginated. Requires `webhooks:read`.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    limit?: number;
+                    starting_after?: string;
+                    ending_before?: string;
+                    event?: components["schemas"]["WebhookEvent"] & unknown;
+                    status?: "delivered" | "failed";
+                    start?: string;
+                    end?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description A page of delivery attempts */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["WebhookDeliveryList"];
                     };
                 };
                 /** @description Invalid request */
@@ -4328,7 +5065,7 @@ export type components = {
              * @default en-US
              */
             language: string;
-            /** @description Silence before a turn is considered finished. Lower is snappier and more prone to cutting people off. */
+            /** @description Silence before a turn is considered finished, in milliseconds. Lower is snappier and more prone to cutting people off. Default 300. */
             endpointing_ms?: number;
         };
         LlmConfig: {
@@ -4343,8 +5080,11 @@ export type components = {
             model: string;
             /** @example 21m00Tcm4TlvDq8ikWAM */
             voice?: string;
+            /** @description Higher is more consistent and flatter; lower is more expressive and more variable. ElevenLabs only. */
             stability?: number;
+            /** @description How closely the output tracks the original voice recording. ElevenLabs only. */
             similarity_boost?: number;
+            /** @description Speaking rate, 1 being the voice's natural pace. ElevenLabs only. */
             speed?: number;
         };
         RealtimeConfig: {
@@ -4362,6 +5102,7 @@ export type components = {
              * @enum {string}
              */
             interrupt_sensitivity: "low" | "normal" | "high";
+            /** @description Extra silence tolerated after an utterance that sounded unfinished, in milliseconds. Default 500. */
             silence_wait_ms?: number;
         };
         /** @description Either a composed pipeline (stt + llm + tts) or a single realtime model. Not both. */
@@ -4372,6 +5113,60 @@ export type components = {
             realtime?: components["schemas"]["RealtimeConfig"];
             turn_taking?: components["schemas"]["TurnTaking"];
         } | null;
+        HumanTransferDestination: {
+            /**
+             * @description Your own id for this destination. This, and `name`, are all the model is ever told.
+             * @example billing
+             */
+            id: string;
+            /**
+             * @description What the agent calls this destination when it offers or announces a transfer.
+             * @example Billing team
+             */
+            name: string;
+            /**
+             * @description Only `phone` today. Warm transfer to another agent is not built.
+             * @default phone
+             * @enum {string}
+             */
+            type: "phone";
+            /**
+             * @description Dialled server-side. Never sent to the model.
+             * @example +14155550100
+             */
+            phone_number: string;
+            /** @default true */
+            enabled: boolean;
+            /** @description Overrides the transfer-wide timeout for this destination. Null inherits it. */
+            ring_timeout_seconds?: number | null;
+        };
+        /** @description Hand a live caller to a person. Replaced as a whole on update, never merged. */
+        HumanTransfer: {
+            /** @default false */
+            enabled: boolean;
+            /**
+             * @description The caller is handed straight over. Attended transfer, where the agent speaks to the human first, is not built yet.
+             * @default blind
+             * @enum {string}
+             */
+            mode: "blind";
+            /** @description Used when the caller asks for "a person" without naming one. Must be an enabled destination. */
+            default_destination_id?: string | null;
+            /**
+             * @description How long a destination may ring before the caller is handed back to the agent.
+             * @default 20
+             */
+            ring_timeout_seconds: number;
+            /**
+             * @description Stops a loop where the agent keeps re-dialling an unreachable human.
+             * @default 3
+             */
+            max_transfers_per_call: number;
+            /** @default true */
+            return_to_agent_on_failure: boolean;
+            /** @description Replaced as a whole on update, so send the complete list every time. */
+            destinations: components["schemas"]["HumanTransferDestination"][];
+        };
         Agent: {
             /** @example 6a96a3ead6e886d42462dd3e */
             id: string;
@@ -4387,6 +5182,7 @@ export type components = {
             /** @example 6a96a3ead6e886d42462dd3e */
             outbound_phone_number_id: string | null;
             appointment_booking_enabled: boolean;
+            human_transfer: components["schemas"]["HumanTransfer"];
             /**
              * Format: date-time
              * @description ISO 8601, always UTC.
@@ -4439,6 +5235,7 @@ export type components = {
             outbound_phone_number_id?: string;
             /** @default false */
             appointment_booking_enabled: boolean;
+            human_transfer?: components["schemas"]["HumanTransfer"] & unknown;
         };
         UpdateAgent: {
             name?: string;
@@ -4455,6 +5252,135 @@ export type components = {
             outbound_phone_number_id?: string;
             /** @default false */
             appointment_booking_enabled: boolean;
+            human_transfer?: components["schemas"]["HumanTransfer"] & unknown;
+        };
+        Call: {
+            /** @example 6a96a3ead6e886d42462dd3e */
+            id: string;
+            /** @enum {string} */
+            object: "call";
+            /** @description Stable id for this call across logs, usage and webhooks. */
+            session_id: string;
+            /** @enum {string} */
+            status: "queued" | "ringing" | "in-progress" | "completed" | "failed" | "busy" | "no-answer" | "canceled";
+            /** @enum {string} */
+            direction: "inbound" | "outbound";
+            /**
+             * @description `phone` for a call over your SIP trunk; `web` for a realtime session from a browser or app (POST /v1/realtime/sessions). Web sessions are inbound and have no `from`/`to`.
+             * @enum {string}
+             */
+            channel: "phone" | "web";
+            /** @example 6a96a3ead6e886d42462dd3e */
+            agent_id: string | null;
+            /** @example 6a96a3ead6e886d42462dd3e */
+            lead_id: string | null;
+            /** @example 6a96a3ead6e886d42462dd3e */
+            campaign_id: string | null;
+            from: string | null;
+            to: string | null;
+            duration_seconds: number | null;
+            engine: string | null;
+            recording_url: string | null;
+            summary: string | null;
+            /**
+             * @description Micro-USD. 1_000_000 = $1.00.
+             * @example 194000
+             */
+            cost_micros: number | null;
+            /** @description Whatever you attached to POST /v1/calls, returned verbatim. Null if you attached none. */
+            metadata: {
+                [key: string]: string;
+            } | null;
+            /**
+             * @description Q.850 hangup cause from the carrier, or null if the call connected. Branch on this rather than on `failure_reason`, which is prose and may be reworded. 17 busy, 19 no answer, 21 rejected by the carrier, 34 congestion, 102 timeout.
+             * @example 21
+             */
+            failure_code: number | null;
+            /**
+             * @description What to actually do about the failure, in plain language. Null if the call connected.
+             * @example The provider rejected the call outright (403/407). In order of likelihood: your carrier account is suspended, closed, or out of balance; …
+             */
+            failure_reason: string | null;
+            /**
+             * Format: date-time
+             * @description ISO 8601, always UTC.
+             * @example 2026-09-01T12:00:00.000Z
+             */
+            started_at: string | null;
+            /**
+             * Format: date-time
+             * @description ISO 8601, always UTC.
+             * @example 2026-09-01T12:00:00.000Z
+             */
+            ended_at: string | null;
+        };
+        TestCall: {
+            /**
+             * @description The number to ring. A real call to a real phone.
+             * @example +14155550100
+             */
+            to: string;
+            /**
+             * @description Defaults to the agent's own outbound number.
+             * @example 6a96a3ead6e886d42462dd3e
+             */
+            from_number_id?: string;
+            /**
+             * @description What to say. Defaults to the agent's opening message, which is usually what you want to hear.
+             * @example This is a test call from Wixzel Phone. Goodbye.
+             */
+            phrase?: string;
+        };
+        RealtimeSession: {
+            /**
+             * @description Becomes the `session_id` of the resulting call.
+             * @example rt-5b0c7c0e-9d1f-4c52-8a9e-2f0d3a4b6c7d
+             */
+            id: string;
+            /** @enum {string} */
+            object: "realtime_session";
+            client_secret: {
+                /** @description Pass as the `client_secret` query parameter when opening the socket. Single use. */
+                value: string;
+                /**
+                 * Format: date-time
+                 * @description Connect before this. One minute after creation.
+                 * @example 2026-09-01T12:00:00.000Z
+                 */
+                expires_at: string;
+            };
+            /** @example wss://api.phone.wixzel.com/v1/realtime */
+            url: string;
+            /** @example 6a96a3ead6e886d42462dd3e */
+            agent_id: string;
+            /** @example gemini_live */
+            engine: string;
+            max_duration_seconds: number;
+            /**
+             * @description Base64 G.711 µ-law, 8 kHz mono, both directions — what a phone line carries.
+             * @enum {string}
+             */
+            audio_format: "mulaw_8000";
+        };
+        CreateRealtimeSession: {
+            /** @example 6a96a3ead6e886d42462dd3e */
+            agent_id: string;
+            /**
+             * @description Existing lead to attribute the session to — merge fields such as {{name}} resolve from it, and appointment booking uses its phone. Without one, merge fields resolve to nothing and the call has no lead.
+             * @example 6a96a3ead6e886d42462dd3e
+             */
+            lead_id?: string;
+            /** @description Your own identifiers, kept verbatim on the resulting call and echoed in its `callCompleted` webhook. Flat, string to string. Never sent to the model. */
+            metadata?: {
+                [key: string]: string;
+            };
+            /**
+             * @description Hard cap on the conversation. Defaults to 600; at most 3600.
+             * @example 600
+             */
+            max_duration_seconds?: number;
+            /** @description When set, the socket is refused unless the browser's Origin is one of these. Recommended for browser use: it stops a secret copied out of your page being used from another site. */
+            allowed_origins?: string[];
         };
         Lead: {
             /** @example 6a96a3ead6e886d42462dd3e */
@@ -4894,57 +5820,6 @@ export type components = {
             /** @example 6a96a3ead6e886d42462dd3e */
             lead_id?: string;
         };
-        Call: {
-            /** @example 6a96a3ead6e886d42462dd3e */
-            id: string;
-            /** @enum {string} */
-            object: "call";
-            /** @description Stable id for this call across logs, usage and webhooks. */
-            session_id: string;
-            /** @enum {string} */
-            status: "queued" | "ringing" | "in-progress" | "completed" | "failed" | "busy" | "no-answer" | "canceled";
-            /** @enum {string} */
-            direction: "inbound" | "outbound";
-            /** @example 6a96a3ead6e886d42462dd3e */
-            agent_id: string | null;
-            /** @example 6a96a3ead6e886d42462dd3e */
-            lead_id: string | null;
-            /** @example 6a96a3ead6e886d42462dd3e */
-            campaign_id: string | null;
-            from: string | null;
-            to: string | null;
-            duration_seconds: number | null;
-            engine: string | null;
-            recording_url: string | null;
-            summary: string | null;
-            /**
-             * @description Micro-USD. 1_000_000 = $1.00.
-             * @example 194000
-             */
-            cost_micros: number | null;
-            /**
-             * @description Q.850 hangup cause from the carrier, or null if the call connected. Branch on this rather than on `failure_reason`, which is prose and may be reworded. 17 busy, 19 no answer, 21 rejected by the carrier, 34 congestion, 102 timeout.
-             * @example 21
-             */
-            failure_code: number | null;
-            /**
-             * @description What to actually do about the failure, in plain language. Null if the call connected.
-             * @example The provider rejected the call outright (403/407). In order of likelihood: your carrier account is suspended, closed, or out of balance; …
-             */
-            failure_reason: string | null;
-            /**
-             * Format: date-time
-             * @description ISO 8601, always UTC.
-             * @example 2026-09-01T12:00:00.000Z
-             */
-            started_at: string | null;
-            /**
-             * Format: date-time
-             * @description ISO 8601, always UTC.
-             * @example 2026-09-01T12:00:00.000Z
-             */
-            ended_at: string | null;
-        };
         CreateCall: {
             /** @example +14155550100 */
             to: string;
@@ -4961,7 +5836,7 @@ export type components = {
              */
             lead_id?: string;
             lead_name?: string;
-            /** @description Echoed back on the call and in webhooks. Not sent to the model. */
+            /** @description Your own identifiers — an order number, a ticket id, a tenant — kept verbatim on the call and echoed back on it and in its `outboundCall` and `callCompleted` webhooks. Flat, string to string. Never sent to the model. */
             metadata?: {
                 [key: string]: string;
             };
@@ -5002,9 +5877,12 @@ export type components = {
             errors: components["schemas"]["CallError"][];
             transcript: components["schemas"]["TranscriptEntry"][];
             transfers: {
+                destination_id: string | null;
                 destination_name: string | null;
+                /** @description ringing, connected, completed, busy, no_answer, rejected, unavailable or failed. */
                 status: string;
                 reason: string | null;
+                /** @description 1-based within this call, capped by the agent’s max_transfers_per_call. */
                 attempt: number;
                 /**
                  * Format: date-time
@@ -5018,7 +5896,18 @@ export type components = {
                  * @example 2026-09-01T12:00:00.000Z
                  */
                 answered_at: string | null;
+                /**
+                 * Format: date-time
+                 * @description ISO 8601, always UTC.
+                 * @example 2026-09-01T12:00:00.000Z
+                 */
+                ended_at: string | null;
+                /** @description How long the destination rang. A long ring followed by no_answer is a person who was not there; an instant failure is usually configuration. */
+                ring_duration_ms: number | null;
+                /** @description How long the caller and the human actually spoke. */
+                connected_duration_ms: number | null;
                 failure_code: string | null;
+                /** @description Raw Q.850 cause from Asterisk, for diagnosing a carrier-side rejection. */
                 sip_cause: number | null;
             }[];
         };
@@ -5174,7 +6063,7 @@ export type components = {
         };
         CreateTopup: {
             /**
-             * @description Amount to add, in US dollars.
+             * @description Amount to add, in whole US dollars.
              * @example 25
              */
             amount_usd: number;
@@ -5251,6 +6140,136 @@ export type components = {
              */
             expires_at?: string;
         };
+        EngineLanguage: {
+            /**
+             * @description The value to send as `voice.stt.language`, `voice.realtime.language` or the agent's `language`. Regional variants of a listed code are accepted and resolve to the same pipeline, so `en-GB` works wherever `en` is listed.
+             * @example ta-IN
+             */
+            code: string;
+            /**
+             * @description English name of the language.
+             * @example Tamil
+             */
+            name: string;
+            /** @description Which stages of this engine serve the language. A composed engine lists a language only when both its speech-to-text and its text-to-speech support it. */
+            components: ("stt" | "tts" | "realtime")[];
+        };
+        EngineLanguageList: {
+            /** @enum {string} */
+            object: "list";
+            /** @example sarvam */
+            engine: string;
+            /** @description Whether the engine can carry a call right now. The language list is returned either way, so a picker still renders during a provider outage. */
+            available: boolean;
+            data: components["schemas"]["EngineLanguage"][];
+        };
+        EngineVoice: {
+            /**
+             * @description The value to send as `voice.tts.voice` or `voice.realtime.voice`.
+             * @example 21m00Tcm4TlvDq8ikWAM
+             */
+            id: string;
+            /** @example Rachel */
+            name: string;
+            /** @enum {string} */
+            provider: "elevenlabs" | "sarvam" | "google";
+            /**
+             * @description The provider's own description, where it publishes one. Null rather than inferred: Sarvam publishes speaker ids and nothing else, and guessing a voice's character from its name would read as provider data without being it.
+             * @example Informative
+             */
+            description: string | null;
+            /** @description A sample of the voice, where the provider hosts one. Null otherwise. */
+            preview_url: string | null;
+        };
+        EngineVoiceList: {
+            /** @enum {string} */
+            object: "list";
+            /** @example classic */
+            engine: string;
+            available: boolean;
+            /** @description True when the provider could not be reached and this is the last list that was successfully fetched. The endpoint prefers a stale answer to an error, because a provider outage should not break a voice picker. */
+            stale: boolean;
+            /** @description When the provider list was fetched. Null for engines whose roster is fixed and needs no fetching, such as Sarvam and Gemini. */
+            refreshed_at: string | null;
+            data: components["schemas"]["EngineVoice"][];
+        };
+        /**
+         * @description The value of the `event` field in the delivered payload.
+         * @example callCompleted
+         * @enum {string}
+         */
+        WebhookEvent: "inboundCall" | "outboundCall" | "callCompleted" | "leadCreated" | "leadQualified" | "campaignCompleted" | "appointmentBooked" | "appointmentCanceled" | "callTransferred" | "transferFailed";
+        Webhook: {
+            /** @enum {string} */
+            object: "webhook";
+            /** @description Null until you set one. No events are sent while it is null. */
+            url: string | null;
+            /** @description The master switch. False sends nothing, whatever `events` says. */
+            enabled: boolean;
+            /** @description The events you are subscribed to. An account that has never configured webhooks is subscribed to all of them. */
+            events: components["schemas"]["WebhookEvent"][];
+            /** @description Whether a signing secret exists. The secret itself is never returned — rotate it to see a new one. */
+            secret_set: boolean;
+        };
+        UpdateWebhook: {
+            /**
+             * Format: uri
+             * @description HTTPS URL we POST events to. It must resolve to a public address: a URL pointing at loopback, link-local or private space is refused here and again at delivery time, because this server can reach addresses you cannot.
+             * @example https://example.com/hooks/wixzel
+             */
+            url?: string;
+            enabled?: boolean;
+            /** @description Replaces the subscription entirely. Send the full list you want, not a delta. */
+            events?: components["schemas"]["WebhookEvent"][];
+        };
+        WebhookSecret: {
+            /** @enum {string} */
+            object: "webhook_secret";
+            /**
+             * @description Shown once. Store it now — it cannot be read back.
+             * @example whsec_…
+             */
+            secret: string;
+        };
+        WebhookDelivery: {
+            /** @enum {string} */
+            object: "webhook_delivery";
+            event: components["schemas"]["WebhookEvent"];
+            /** @description Where this attempt was sent — the URL configured at the time, not the current one. */
+            url: string;
+            /** @description 1 for the first POST of an event. Each attempt is its own record. */
+            attempt: number;
+            /**
+             * @description `delivered` means a 2xx. Nothing else counts, including a 3xx.
+             * @enum {string}
+             */
+            status: "delivered" | "failed";
+            /** @description Your endpoint's HTTP status, or null when nothing answered — DNS failure, refused connection, or timeout. */
+            response_status: number | null;
+            /** @description Why it failed, at the transport level. Never your response body: a receiver that echoes the payload back would otherwise store it here. */
+            error: string | null;
+            duration_ms: number;
+            /** @description True when another attempt was scheduled. Retries run in-process, so a deploy between attempts drops the pending one. */
+            will_retry: boolean;
+            /**
+             * Format: date-time
+             * @description ISO 8601, always UTC.
+             * @example 2026-09-01T12:00:00.000Z
+             */
+            occurred_at: string;
+        };
+        TestWebhook: {
+            event: components["schemas"]["WebhookEvent"] & unknown;
+        };
+        WebhookDeliveryList: {
+            /** @enum {string} */
+            object: "list";
+            data: components["schemas"]["WebhookDelivery"][];
+            /** @description True when more records exist after this page. */
+            has_more: boolean;
+            /** @description Pass as starting_after to fetch the next page. */
+            next_cursor: string | null;
+        };
     };
     responses: never;
     parameters: never;
@@ -5264,11 +6283,17 @@ export type TtsConfig = components['schemas']['TtsConfig'];
 export type RealtimeConfig = components['schemas']['RealtimeConfig'];
 export type TurnTaking = components['schemas']['TurnTaking'];
 export type VoiceConfig = components['schemas']['VoiceConfig'];
+export type HumanTransferDestination = components['schemas']['HumanTransferDestination'];
+export type HumanTransfer = components['schemas']['HumanTransfer'];
 export type Agent = components['schemas']['Agent'];
 export type AgentList = components['schemas']['AgentList'];
 export type Error = components['schemas']['Error'];
 export type CreateAgent = components['schemas']['CreateAgent'];
 export type UpdateAgent = components['schemas']['UpdateAgent'];
+export type Call = components['schemas']['Call'];
+export type TestCall = components['schemas']['TestCall'];
+export type RealtimeSession = components['schemas']['RealtimeSession'];
+export type CreateRealtimeSession = components['schemas']['CreateRealtimeSession'];
 export type Lead = components['schemas']['Lead'];
 export type LeadList = components['schemas']['LeadList'];
 export type CreateLead = components['schemas']['CreateLead'];
@@ -5298,7 +6323,6 @@ export type Appointment = components['schemas']['Appointment'];
 export type AppointmentList = components['schemas']['AppointmentList'];
 export type CreateAppointment = components['schemas']['CreateAppointment'];
 export type UpdateAppointment = components['schemas']['UpdateAppointment'];
-export type Call = components['schemas']['Call'];
 export type CreateCall = components['schemas']['CreateCall'];
 export type CallList = components['schemas']['CallList'];
 export type CallError = components['schemas']['CallError'];
@@ -5316,5 +6340,16 @@ export type ApiKey = components['schemas']['ApiKey'];
 export type ApiKeyList = components['schemas']['ApiKeyList'];
 export type CreatedApiKey = components['schemas']['CreatedApiKey'];
 export type CreateApiKey = components['schemas']['CreateApiKey'];
+export type EngineLanguage = components['schemas']['EngineLanguage'];
+export type EngineLanguageList = components['schemas']['EngineLanguageList'];
+export type EngineVoice = components['schemas']['EngineVoice'];
+export type EngineVoiceList = components['schemas']['EngineVoiceList'];
+export type WebhookEvent = components['schemas']['WebhookEvent'];
+export type Webhook = components['schemas']['Webhook'];
+export type UpdateWebhook = components['schemas']['UpdateWebhook'];
+export type WebhookSecret = components['schemas']['WebhookSecret'];
+export type WebhookDelivery = components['schemas']['WebhookDelivery'];
+export type TestWebhook = components['schemas']['TestWebhook'];
+export type WebhookDeliveryList = components['schemas']['WebhookDeliveryList'];
 export type $defs = Record<string, never>;
 export type operations = Record<string, never>;

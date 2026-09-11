@@ -6,7 +6,7 @@ import { allTools } from './tools/index.js';
 import { registerTools } from './tooling.js';
 
 export const SERVER_NAME = 'wixzel-phone';
-export const SERVER_VERSION = '0.2.1';
+export const SERVER_VERSION = '0.3.0';
 
 export interface CreateServerOptions {
     /** An already-constructed client, or the options to build one. */

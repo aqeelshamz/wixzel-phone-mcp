@@ -97,3 +97,133 @@ class EngineList {
   /// The engines.
   final List<Engine> data;
 }
+
+/// One language an engine can hold a conversation in.
+class EngineLanguage {
+  /// Builds a language record.
+  const EngineLanguage({
+    required this.code,
+    required this.name,
+    required this.components,
+  });
+
+  /// Parses the API's shape.
+  factory EngineLanguage.fromJson(Json json) => EngineLanguage(
+        code: readString(json, 'code'),
+        name: readString(json, 'name'),
+        components: readStringList(json, 'components'),
+      );
+
+  /// The value to send as an agent's `language`, or as `voice.stt.language`
+  /// / `voice.realtime.language`. Regional variants of a listed code are
+  /// accepted, so `en-GB` works wherever `en` is listed.
+  final String code;
+
+  /// English name of the language.
+  final String name;
+
+  /// Which stages serve it: `stt`, `tts` or `realtime`.
+  final List<String> components;
+}
+
+/// The languages one engine serves.
+class EngineLanguageList {
+  /// Builds a language list.
+  const EngineLanguageList({
+    required this.engine,
+    required this.available,
+    required this.data,
+  });
+
+  /// Parses the API's shape.
+  factory EngineLanguageList.fromJson(Json json) => EngineLanguageList(
+        engine: readString(json, 'engine'),
+        available: readBool(json, 'available'),
+        data: readList(json, 'data', EngineLanguage.fromJson),
+      );
+
+  /// The engine these languages belong to.
+  final String engine;
+
+  /// Whether the engine can carry a call right now. The list is returned
+  /// either way, so a picker still renders during a provider outage.
+  final bool available;
+
+  /// The languages.
+  final List<EngineLanguage> data;
+}
+
+/// One voice an engine can speak as.
+class EngineVoice {
+  /// Builds a voice record.
+  const EngineVoice({
+    required this.id,
+    required this.name,
+    required this.provider,
+    this.description,
+    this.previewUrl,
+  });
+
+  /// Parses the API's shape.
+  factory EngineVoice.fromJson(Json json) => EngineVoice(
+        id: readString(json, 'id'),
+        name: readString(json, 'name'),
+        provider: readString(json, 'provider'),
+        description: readStringOrNull(json, 'description'),
+        previewUrl: readStringOrNull(json, 'preview_url'),
+      );
+
+  /// The value to send as `voice.tts.voice` or `voice.realtime.voice`.
+  final String id;
+
+  /// The voice's name.
+  final String name;
+
+  /// Which provider speaks it: `elevenlabs`, `sarvam` or `google`.
+  final String provider;
+
+  /// The provider's own description, where it publishes one. Null rather
+  /// than inferred.
+  final String? description;
+
+  /// A sample of the voice, where the provider hosts one.
+  final String? previewUrl;
+}
+
+/// The voices one engine can speak as.
+class EngineVoiceList {
+  /// Builds a voice list.
+  const EngineVoiceList({
+    required this.engine,
+    required this.available,
+    required this.stale,
+    required this.data,
+    this.refreshedAt,
+  });
+
+  /// Parses the API's shape.
+  factory EngineVoiceList.fromJson(Json json) => EngineVoiceList(
+        engine: readString(json, 'engine'),
+        available: readBool(json, 'available'),
+        stale: readBool(json, 'stale'),
+        refreshedAt: readDateTime(json, 'refreshed_at'),
+        data: readList(json, 'data', EngineVoice.fromJson),
+      );
+
+  /// The engine these voices belong to.
+  final String engine;
+
+  /// Whether the engine can carry a call right now.
+  final bool available;
+
+  /// True when the provider could not be reached and this is the last list
+  /// that was fetched. The API prefers a stale answer to an error.
+  final bool stale;
+
+  /// When the provider list was fetched. Null for engines whose roster is
+  /// fixed and needs no fetching, such as Sarvam and Gemini.
+  final DateTime? refreshedAt;
+
+  /// The voices.
+  final List<EngineVoice> data;
+}

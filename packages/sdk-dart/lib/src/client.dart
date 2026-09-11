@@ -10,6 +10,8 @@ import 'resources/billing.dart';
 import 'resources/calls.dart';
 import 'resources/campaigns.dart';
 import 'resources/engines.dart';
+import 'resources/webhooks.dart';
+import 'resources/realtime.dart';
 import 'resources/knowledge_bases.dart';
 import 'resources/leads.dart';
 import 'resources/phone_numbers.dart';
@@ -68,7 +70,9 @@ class WixzelPhone {
         usage = Usage(_transport),
         billing = Billing(_transport),
         apiKeys = ApiKeys(_transport),
-        engines = Engines(_transport);
+        engines = Engines(_transport),
+        webhooks = Webhooks(_transport),
+        realtime = Realtime(_transport);
 
   final Transport _transport;
 
@@ -107,6 +111,12 @@ class WixzelPhone {
 
   /// What the platform can serve right now.
   final Engines engines;
+
+  /// Where events are sent, and what happened when they got there.
+  final Webhooks webhooks;
+
+  /// The server-side half of realtime: minting sessions for your apps.
+  final Realtime realtime;
 
   /// Whether the key is live, test, or neither.
   KeyMode get keyMode => _transport.keyMode;

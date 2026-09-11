@@ -167,3 +167,34 @@ class UpdateAgent {
         'appointment_booking_enabled': appointmentBookingEnabled,
       });
 }
+
+/// A test call: ring a number and have the agent speak one phrase.
+///
+/// A probe, not a conversation. It answers "is the trunk configured and does
+/// this agent sound right" in seconds, and it rings a real phone and spends
+/// real credit doing it.
+class TestCall {
+  /// Builds a test-call request.
+  const TestCall({
+    required this.to,
+    this.fromNumberId,
+    this.phrase,
+  });
+
+  /// Destination in E.164 form, e.g. `+14155551234`. A real phone rings.
+  final String to;
+
+  /// Defaults to the agent's own outbound number.
+  final String? fromNumberId;
+
+  /// What to say. Defaults to the agent's opening message, which is usually
+  /// what you want to hear.
+  final String? phrase;
+
+  /// The API's wire shape.
+  Json toJson() => omitNulls({
+        'to': to,
+        'from_number_id': fromNumberId,
+        'phrase': phrase,
+      });
+}

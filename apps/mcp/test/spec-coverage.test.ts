@@ -5,6 +5,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { allTools } from '../src/tools/index.js';
 import { scopes } from '../src/schemas.js';
+import { SERVER_VERSION } from '../src/server.js';
 
 /**
  * The tools are hand-written, so this is what keeps them honest: every
@@ -12,6 +13,7 @@ import { scopes } from '../src/schemas.js';
  * real operation, and the scope enum matches the API's.
  */
 const here = dirname(fileURLToPath(import.meta.url));
+const pkg = JSON.parse(readFileSync(resolve(here, '../package.json'), 'utf8')) as { version: string };
 const spec = JSON.parse(readFileSync(resolve(here, '../../../docs/openapi.json'), 'utf8')) as {
     paths: Record<string, Record<string, unknown>>;
     components: { schemas: { CreateApiKey: { properties: { scopes: { items: { enum: string[] } } } } } };
@@ -47,5 +49,15 @@ describe('spec coverage', () => {
 
     test('the scope list matches the API\'s enum exactly', () => {
         assert.deepEqual([...scopes], spec.components.schemas.CreateApiKey.properties.scopes.items.enum);
+    });
+
+    /**
+     * The version the server announces is a hand-typed constant, so nothing
+     * kept it in step with package.json — and it drifted: 0.2.2 shipped to npm
+     * announcing itself as 0.2.1 in the MCP handshake and on /health, which is
+     * the one place a client looks to find out what it is talking to.
+     */
+    test('the announced version matches package.json', () => {
+        assert.equal(SERVER_VERSION, pkg.version);
     });
 });

@@ -205,6 +205,7 @@ class Call {
     required this.sessionId,
     required this.status,
     required this.direction,
+    this.channel = 'phone',
     this.agentId,
     this.leadId,
     this.campaignId,
@@ -215,6 +216,7 @@ class Call {
     this.recordingUrl,
     this.summary,
     this.costMicros,
+    this.metadata,
     this.failureCode,
     this.failureReason,
     this.startedAt,
@@ -227,6 +229,7 @@ class Call {
         sessionId: readString(json, 'session_id'),
         status: CallStatus.parse(readStringOrNull(json, 'status')),
         direction: CallDirection.parse(readStringOrNull(json, 'direction')),
+        channel: readStringOrNull(json, 'channel') ?? 'phone',
         agentId: readStringOrNull(json, 'agent_id'),
         leadId: readStringOrNull(json, 'lead_id'),
         campaignId: readStringOrNull(json, 'campaign_id'),
@@ -237,6 +240,7 @@ class Call {
         recordingUrl: readStringOrNull(json, 'recording_url'),
         summary: readStringOrNull(json, 'summary'),
         costMicros: readIntOrNull(json, 'cost_micros'),
+        metadata: readMap(json, 'metadata'),
         failureCode: readIntOrNull(json, 'failure_code'),
         failureReason: readStringOrNull(json, 'failure_reason'),
         startedAt: readDateTime(json, 'started_at'),
@@ -254,6 +258,10 @@ class Call {
 
   /// Which way it went.
   final CallDirection direction;
+
+  /// `phone` for a call over your SIP trunk, `web` for a realtime session
+  /// from a browser or app.
+  final String channel;
 
   /// The agent that held the conversation.
   final String? agentId;
@@ -285,6 +293,10 @@ class Call {
   /// What it cost, in micro-USD. 1,000,000 = $1.00.
   final int? costMicros;
 
+  /// Whatever you attached to `calls.create`, returned verbatim. Null if you
+  /// attached none.
+  final Map<String, dynamic>? metadata;
+
   /// The Q.850 hangup cause, or null if the call connected. Branch on this
   /// rather than on [failureReason], which is prose: 17 busy, 19 no answer,
   /// 21 rejected by the carrier, 34 congestion, 102 timeout.
@@ -309,6 +321,7 @@ class CallDetail extends Call {
     required super.sessionId,
     required super.status,
     required super.direction,
+    super.channel,
     required this.errors,
     required this.transcript,
     required this.transfers,
@@ -322,6 +335,7 @@ class CallDetail extends Call {
     super.recordingUrl,
     super.summary,
     super.costMicros,
+    super.metadata,
     super.failureCode,
     super.failureReason,
     super.startedAt,
@@ -336,6 +350,7 @@ class CallDetail extends Call {
       sessionId: base.sessionId,
       status: base.status,
       direction: base.direction,
+      channel: base.channel,
       agentId: base.agentId,
       leadId: base.leadId,
       campaignId: base.campaignId,
@@ -346,6 +361,7 @@ class CallDetail extends Call {
       recordingUrl: base.recordingUrl,
       summary: base.summary,
       costMicros: base.costMicros,
+      metadata: base.metadata,
       failureCode: base.failureCode,
       failureReason: base.failureReason,
       startedAt: base.startedAt,

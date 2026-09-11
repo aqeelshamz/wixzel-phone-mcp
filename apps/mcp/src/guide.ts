@@ -13,8 +13,9 @@ One API key, one prepaid credit balance, every voice engine. https://phone.wixze
 
 - An AGENT is a prompt plus a voice engine (speech-to-text, LLM, text-to-speech,
   or one realtime model that does all three).
-- A SIP TRUNK is the user's own carrier account (Twilio, Telnyx, Plivo, any SIP
-  provider). Wixzel does not sell numbers or minutes; the carrier's rates stay theirs.
+- A SIP TRUNK is the user's own carrier account (Twilio, Telnyx, Plivo, Vonage,
+  Bandwidth, Exotel, Vobiz, any SIP provider). Wixzel does not sell numbers or
+  minutes; the carrier's rates stay theirs.
 - A PHONE NUMBER is a number the user owns at that carrier, registered on the trunk.
   Give it an inbound_agent_id and inbound calls are answered by that agent.
 - A CALL connects an agent to a real phone over the trunk. Outbound calls are placed

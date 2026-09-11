@@ -32,8 +32,15 @@ export const e164 = z
 
 const providerModel = z
     .string()
-    .regex(/^[a-z0-9_-]+\/[a-zA-Z0-9._-]+$/, 'must be "provider/model", e.g. deepgram/nova-3')
-    .describe('"provider/model", e.g. "deepgram/nova-3". Call list_engines for what is available and priced.');
+    // The model half may itself contain slashes: OpenRouter ids are
+    // vendor-qualified, so `openrouter/anthropic/claude-sonnet-4.5` is the
+    // openrouter provider and the model `anthropic/claude-sonnet-4.5`. Only the
+    // FIRST slash separates the two. This mirrors ProviderModelSchema in
+    // @wixzel/schemas; a stricter copy here rejects valid models before the
+    // request ever reaches the API, which is worse than no validation at all.
+    .regex(/^[a-z0-9_-]+\/[a-zA-Z0-9._-]+(?:\/[a-zA-Z0-9._-]+)*$/,
+        'must be "provider/model", e.g. deepgram/nova-3 or openrouter/anthropic/claude-sonnet-4.5')
+    .describe('"provider/model", e.g. "deepgram/nova-3" or "openrouter/anthropic/claude-sonnet-4.5". Call list_engines for what is available and priced.');
 
 export const sttConfig = z.object({
     model: providerModel,

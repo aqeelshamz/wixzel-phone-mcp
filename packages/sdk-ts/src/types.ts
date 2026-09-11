@@ -17,9 +17,11 @@ export type {
     SipTrunk, SipTrunkList, CreateSipTrunk, UpdateSipTrunk, SipTrunkStatus, SipTrunkTest, SipLogEntry, SipLogList,
     Appointment, AppointmentList, CreateAppointment, UpdateAppointment,
     Call, CallDetail, CallList, CreateCall, CallError, TranscriptEntry,
+    CreateRealtimeSession, RealtimeSession,
     UsageEvent, UsageEventList, UsageSummary,
     Balance, LedgerEntry, LedgerEntryList, Topup, CreateTopup,
     ApiKey, ApiKeyList, CreateApiKey, CreatedApiKey,
+    Webhook, UpdateWebhook, WebhookSecret, WebhookEvent, WebhookDelivery, WebhookDeliveryList, TestWebhook,
 } from './generated/openapi.js';
 
 /** The error envelope the API returns on every failure. */
@@ -44,13 +46,21 @@ export type LeadListQuery = Query<'/v1/leads'>;
 export type UsageEventsQuery = Query<'/v1/usage/events'>;
 export type UsageSummaryQuery = Query<'/v1/usage/summary'>;
 export type SipTrunkLogsQuery = Query<'/v1/sip-trunks/{id}/logs'>;
+export type WebhookDeliveryQuery = Query<'/v1/webhook/deliveries'>;
 
 export type CallStatus = NonNullable<CallListQuery['status']>;
 export type CallDirection = NonNullable<CallListQuery['direction']>;
 export type UsageComponent = NonNullable<UsageEventsQuery['component']>;
 
 export type Transcript = paths['/v1/calls/{id}/transcript']['get']['responses'][200]['content']['application/json'];
+export type TestCall = NonNullable<paths['/v1/agents/{id}/test-call']['post']['requestBody']>['content']['application/json'];
+
 export type EngineList = paths['/v1/engines']['get']['responses'][200]['content']['application/json'];
 export type Engine = EngineList['data'][number];
+
+export type EngineLanguageList = paths['/v1/engines/{engine}/languages']['get']['responses'][200]['content']['application/json'];
+export type EngineLanguage = EngineLanguageList['data'][number];
+export type EngineVoiceList = paths['/v1/engines/{engine}/voices']['get']['responses'][200]['content']['application/json'];
+export type EngineVoice = EngineVoiceList['data'][number];
 
 export type Scope = components['schemas']['CreateApiKey']['scopes'][number];

@@ -8,13 +8,22 @@
  * not there. The Dart SDK carries the same table with the same names.
  */
 export const OPERATIONS = {
+    'GET /v1/webhook': 'webhooks.retrieve',
+    'PATCH /v1/webhook': 'webhooks.update',
+    'POST /v1/webhook/rotate-secret': 'webhooks.rotateSecret',
+    'POST /v1/webhook/test': 'webhooks.test',
+    'GET /v1/webhook/deliveries': 'webhooks.deliveries',
+
     'GET /v1/engines': 'engines.list',
+    'GET /v1/engines/{engine}/languages': 'engines.languages',
+    'GET /v1/engines/{engine}/voices': 'engines.voices',
 
     'GET /v1/agents': 'agents.list',
     'POST /v1/agents': 'agents.create',
     'GET /v1/agents/{id}': 'agents.retrieve',
     'PATCH /v1/agents/{id}': 'agents.update',
     'DELETE /v1/agents/{id}': 'agents.delete',
+    'POST /v1/agents/{id}/test-call': 'agents.testCall',
 
     'POST /v1/calls': 'calls.create',
     'GET /v1/calls': 'calls.list',
@@ -22,6 +31,8 @@ export const OPERATIONS = {
     'DELETE /v1/calls/{id}': 'calls.delete',
     'POST /v1/calls/{id}/hangup': 'calls.hangup',
     'GET /v1/calls/{id}/transcript': 'calls.transcript',
+
+    'POST /v1/realtime/sessions': 'realtime.createSession',
 
     'GET /v1/leads': 'leads.list',
     'POST /v1/leads': 'leads.create',

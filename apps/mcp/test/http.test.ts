@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import { resolveHttpOptions, resourceMetadataUrl, startHttp, type RunningHttpServer } from '../src/http.js';
+import { allTools } from '../src/tools/index.js';
 
 /**
  * A fake Wixzel Phone API behind the MCP host. Keys starting with "good" are
@@ -94,7 +95,10 @@ describe('HTTP mode', () => {
         const client = new Client({ name: 'http-test', version: '0' });
         await client.connect(transport);
         const { tools } = await client.listTools();
-        assert.equal(tools.length, 56);
+        // Against the registry, not a literal: the invariant is that the HTTP
+        // host exposes every registered tool, and a hardcoded count only ever
+        // fails later, in an unrelated change, for a reason nobody remembers.
+        assert.equal(tools.length, allTools.length);
 
         const engines = await client.callTool({ name: 'list_engines', arguments: {} });
         assert.equal(engines.isError, undefined);

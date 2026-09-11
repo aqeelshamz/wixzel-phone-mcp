@@ -50,10 +50,10 @@ enum ApiScope {
   /// Create and change appointments.
   appointmentsWrite('appointments:write'),
 
-  /// Reserved; there are no webhook endpoints yet.
+  /// Read the webhook endpoint and its delivery history.
   webhooksRead('webhooks:read'),
 
-  /// Reserved; there are no webhook endpoints yet.
+  /// Change the webhook endpoint, rotate its secret and send test events.
   webhooksWrite('webhooks:write'),
 
   /// List API keys.

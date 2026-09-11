@@ -18,8 +18,8 @@ const trunkFields = {
     send_plus: z
         .boolean()
         .optional()
-        .describe('Keep the leading "+" when dialling, so the request URI reads sip:+15551234567@host. Most carriers want true.'),
-    provider_name: z.string().optional().describe('Free text, e.g. "twilio", "telnyx", "plivo".'),
+        .describe('Keep the leading "+" when dialling, so the request URI reads sip:+15551234567@host. Twilio, Telnyx and Vobiz want true; many wholesale carriers answer 408 unless it is false.'),
+    provider_name: z.string().optional().describe('Free text, e.g. "twilio", "telnyx", "plivo", "vonage", "bandwidth", "exotel", "vobiz".'),
 };
 
 export const sipTrunkTools = [
@@ -48,7 +48,7 @@ export const sipTrunkTools = [
         endpoint: 'POST /v1/sip-trunks',
         title: 'Create a SIP trunk',
         description:
-            'Connect the user\'s own carrier (Twilio, Telnyx, Plivo, any SIP provider). Wixzel does not resell telephony. ' +
+            'Connect the user\'s own carrier (Twilio, Telnyx, Plivo, Vonage, Bandwidth, Exotel, Vobiz, any SIP provider). Wixzel does not resell telephony. ' +
             'After creating, tell the user to allowlist the returned platform_ip with their carrier (for outbound) and to set the carrier\'s origination URI to origination_uri (for inbound). ' +
             'Then run check_sip_trunk_status.',
         input: trunkFields,

@@ -6,6 +6,8 @@ import { Billing } from './resources/billing.js';
 import { Calls } from './resources/calls.js';
 import { Campaigns } from './resources/campaigns.js';
 import { Engines } from './resources/engines.js';
+import { Webhooks } from './resources/webhooks.js';
+import { Realtime } from './resources/realtime.js';
 import { KnowledgeBases } from './resources/knowledge-bases.js';
 import { Leads } from './resources/leads.js';
 import { PhoneNumbers } from './resources/phone-numbers.js';
@@ -50,6 +52,9 @@ export class WixzelPhone {
     readonly billing: Billing;
     readonly apiKeys: ApiKeys;
     readonly engines: Engines;
+    readonly webhooks: Webhooks;
+    /** Server-side half of realtime; the browser half is `wixzel-phone/realtime`. */
+    readonly realtime: Realtime;
 
     private readonly http: Http;
 
@@ -76,6 +81,8 @@ export class WixzelPhone {
         this.billing = new Billing(this.http);
         this.apiKeys = new ApiKeys(this.http);
         this.engines = new Engines(this.http);
+        this.webhooks = new Webhooks(this.http);
+        this.realtime = new Realtime(this.http);
     }
 
     /** `live`, `test`, or `unknown` for a key that is neither. */

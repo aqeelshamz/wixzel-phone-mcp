@@ -1,6 +1,6 @@
 import type { Http, RequestOptions } from '../core/http.js';
 import type { Page } from '../core/page.js';
-import type { Agent, CreateAgent, PaginationQuery, UpdateAgent } from '../types.js';
+import type { Agent, Call, CreateAgent, PaginationQuery, TestCall, UpdateAgent } from '../types.js';
 
 const enc = encodeURIComponent;
 
@@ -25,6 +25,18 @@ export class Agents {
     /** Only the fields sent are changed. Sending `voice` replaces the whole voice object. */
     update(id: string, body: UpdateAgent, opts?: RequestOptions): Promise<Agent> {
         return this.http.request<Agent>('PATCH', `/v1/agents/${enc(id)}`, { ...opts, body });
+    }
+
+    /**
+     * Ring a number and have the agent speak one phrase, then hang up.
+     *
+     * A probe, not a conversation — it answers "is the trunk configured and does
+     * this agent sound right". It rings a real phone and spends real credit, so
+     * an `Idempotency-Key` is generated unless `opts.idempotencyKey` supplies
+     * one. Human transfer is not offered during a test call.
+     */
+    testCall(id: string, body: TestCall, opts?: RequestOptions): Promise<Call> {
+        return this.http.request<Call>('POST', `/v1/agents/${enc(id)}/test-call`, { ...opts, body, idempotent: true });
     }
 
     /** Permanent. Numbers and campaigns pointing at the agent stop working. */

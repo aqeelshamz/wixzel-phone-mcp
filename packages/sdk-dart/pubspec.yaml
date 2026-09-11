@@ -1,6 +1,6 @@
 name: wixzel_phone
 description: Official Dart SDK for the Wixzel Phone API. AI voice agents that place and answer real phone calls over your own SIP trunk, from Dart and Flutter.
-version: 0.1.0
+version: 0.3.0
 repository: https://github.com/aqeelshamz/wixzel-phone-sdks
 homepage: https://phone.wixzel.com
 documentation: https://docs.phone.wixzel.com/sdks
@@ -17,6 +17,7 @@ environment:
 
 dependencies:
   http: ^1.2.0
+  web_socket_channel: ^3.0.0
 
 dev_dependencies:
   lints: ^5.1.0

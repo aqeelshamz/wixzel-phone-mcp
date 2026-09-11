@@ -77,7 +77,14 @@ describe('wixzel-phone-mcp', () => {
         assert.ok(readOnly.includes('list_agents') && readOnly.includes('get_balance'));
         assert.ok(!readOnly.includes('place_call') && !readOnly.includes('delete_agent'));
         const spend = tools.filter((t) => t.annotations?.openWorldHint && !t.annotations?.readOnlyHint).map((t) => t.name);
-        assert.deepEqual(spend.sort(), ['create_topup', 'place_call', 'start_campaign', 'test_sip_trunk']);
+        // Pinned deliberately: adding a tool that rings a phone, spends credit
+        // or POSTs to somebody else's server should be a decision someone makes
+        // here, not a side effect of an annotation copied from a neighbour.
+        // test_sip_trunk and test_webhook reach a third party without spending.
+        assert.deepEqual(spend.sort(), [
+            'create_topup', 'place_call', 'start_campaign', 'test_call_agent',
+            'test_sip_trunk', 'test_webhook',
+        ]);
     });
 
     test('scope requirement is written into the description', async () => {

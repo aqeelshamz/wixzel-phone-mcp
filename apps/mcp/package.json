@@ -1,6 +1,6 @@
 {
   "name": "wixzel-phone-mcp",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "MCP server for Wixzel Phone — lets AI agents such as Claude Code create voice agents, place calls, manage leads and campaigns, and read usage over the Wixzel Phone API.",
   "license": "MIT",
   "type": "module",

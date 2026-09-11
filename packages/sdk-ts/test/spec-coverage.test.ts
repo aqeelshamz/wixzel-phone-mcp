@@ -22,6 +22,7 @@ const HTTP_METHODS = new Set(['get', 'post', 'put', 'patch', 'delete']);
 const RESOURCES = [
     'engines', 'agents', 'calls', 'leads', 'campaigns', 'knowledgeBases',
     'phoneNumbers', 'sipTrunks', 'appointments', 'usage', 'billing', 'apiKeys',
+    'webhooks', 'realtime',
 ] as const;
 
 const client = new WixzelPhone({ apiKey: 'wv_test_x', fetch: (() => Promise.reject(new Error('no'))) as typeof fetch });
